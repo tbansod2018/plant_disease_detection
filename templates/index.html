@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Disease Classifier</title>
+    <style>
+        body {
+            ont-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-image: url('https://images.pexels.com/photos/339614/pexels-photo-339614.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1');
+            background-size: cover;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 90%;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            /* Adding a white background with transparency */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            /* Add this to enable relative positioning */
+            top: 50%;
+            bottom: 50%;
+            /* Add this to vertically center the container */
+            transform: translateY(-50%);
+            /* Add this to vertically center the container */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+
+        .upload-btn {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .upload-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+            max-height: calc(100vh - 180px);
+            /* Add this to limit the height of the result section */
+            overflow-y: auto;
+            /* Add this to enable vertical scrolling when content exceeds height */
+        }
+
+        .image-preview {
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .image-preview img {
+            max-width: 100%;
+            border-radius: 5px;
+        }
+
+        .prediction-info {
+            display: none;
+            text-align: center;
+            text-align: center;
+            margin-top: 20px;
+            /* Adjust this margin as needed */
+            max-height: calc(100vh - 280px);
+            /* Add this to limit the height of the prediction-info section */
+            overflow-y: auto;
+            /* Add this to enable vertical scrolling when content exceeds height */
+        }
+
+        .prediction-info h2 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .prediction-info p {
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Plant Disease Classifier</h1>
+        <form id="upload-form" enctype="multipart/form-data">
+            <label for="image-upload" class="upload-btn">Choose an image</label>
+            <input type="file" id="image-upload" name="image">
+        </form>
+
+        <div class="result" id="result-div">
+            <div class="image-preview" id="image-preview">
+                <img src="" alt="Uploaded Image" id="img-preview">
+            </div>
+            <div class="prediction-info">
+                <h2>Prediction:</h2>
+                <p id="predicted-class"></p>
+                <h2>Description:</h2>
+                <p id="description"></p>
+                <h2>Preventive Steps:</h2>
+                <p id="preventions"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('image-upload').addEventListener('change', function () {
+            const form = document.getElementById('upload-form');
+            const formData = new FormData(form);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const previewDiv = document.getElementById('image-preview');
+                    const previewImg = document.getElementById('img-preview');
+                    const predictionInfo = document.querySelector('.prediction-info');
+                    const predictedClass = document.getElementById('predicted-class');
+                    const description = document.getElementById('description');
+                    const preventions = document.getElementById('preventions');
+
+                    previewImg.src = URL.createObjectURL(this.files[0]);
+                    previewDiv.style.display = 'block';
+
+                    predictedClass.innerText = data.predicted_class;
+                    description.innerText = data.description;
+                    preventions.innerText = data.preventions;
+
+                    predictionInfo.style.display = 'block';
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+
+</html>
